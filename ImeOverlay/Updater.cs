@@ -12,7 +12,7 @@ namespace ImeOverlay
     internal static class Updater
     {
         // ← 본인 GitHub 저장소로 변경
-        private const string REPO = "깃허브 주소";
+        private const string REPO = "YOUR_GITHUB_ID/ImeOverlay";
         private const string API  = $"https://api.github.com/repos/{REPO}/releases/latest";
 
         public static string CurrentVersion =>

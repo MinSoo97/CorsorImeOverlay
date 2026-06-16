@@ -5,8 +5,8 @@
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <AssemblyName>CursorImeOverlay</AssemblyName>
-    <RootNamespace>CursorImeOverlay</RootNamespace>
+    <AssemblyName>ImeOverlay</AssemblyName>
+    <RootNamespace>ImeOverlay</RootNamespace>
     <ApplicationIcon>app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <PublishSingleFile>true</PublishSingleFile>
