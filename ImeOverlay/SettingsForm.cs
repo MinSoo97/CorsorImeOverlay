@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -21,8 +22,10 @@ namespace ImeOverlay
 
         private DarkButton _btnPage1 = null!;
         private DarkButton _btnPage2 = null!;
+        private DarkButton _btnPage3 = null!;
         private Panel _page1 = null!;
         private Panel _page2 = null!;
+        private Panel _page3 = null!;
 
         // 1페이지
         private DarkRadio   _rbAlways   = null!;
@@ -92,12 +95,15 @@ namespace ImeOverlay
             };
             var sep = new Panel { Location = new Point(20, 96), Size = new Size(sidebarW - 40, 1), BackColor = C_BORDER };
 
-            _btnPage1 = new DarkButton("⚙  표시 설정", C_ACCENT, C_TEXT)
+            _btnPage1 = new DarkButton("⚙️  표시 설정", C_ACCENT, C_TEXT)
                 { Location = new Point(0, 112), Size = new Size(sidebarW, 48) };
             _btnPage2 = new DarkButton("🎨  스타일", C_ACCENT, C_SUBTEXT)
                 { Location = new Point(0, 160), Size = new Size(sidebarW, 48) };
+            _btnPage3 = new DarkButton("ℹ️  제품 정보", C_ACCENT, C_SUBTEXT)
+                { Location = new Point(0, 208), Size = new Size(sidebarW, 48) };
             _btnPage1.Click += (s, e) => ShowPage(1);
             _btnPage2.Click += (s, e) => ShowPage(2);
+            _btnPage3.Click += (s, e) => ShowPage(3);
 
             var lblVer = new Label
             {
@@ -105,7 +111,7 @@ namespace ImeOverlay
                 Size = new Size(sidebarW, 28), ForeColor = C_SUBTEXT, Font = new Font("맑은 고딕", 8.5f),
                 TextAlign = ContentAlignment.MiddleCenter
             };
-            sidebar.Controls.AddRange(new Control[] { lblTitle, lblSub, sep, _btnPage1, _btnPage2, lblVer });
+            sidebar.Controls.AddRange(new Control[] { lblTitle, lblSub, sep, _btnPage1, _btnPage2, _btnPage3, lblVer });
 
             // ── 콘텐츠 패널들 (사이드바 옆, 버튼바 위까지) ────
             _page1 = new Panel
@@ -118,8 +124,14 @@ namespace ImeOverlay
                 Location = new Point(sidebarW, 0), Size = new Size(contentW, contentH),
                 BackColor = C_PANEL, Visible = false
             };
+            _page3 = new Panel
+            {
+                Location = new Point(sidebarW, 0), Size = new Size(contentW, contentH),
+                BackColor = C_PANEL, Visible = false
+            };
             BuildPage1Content(_page1, contentW, contentH);
             BuildPage2Content(_page2, contentW, contentH);
+            BuildPage3Content(_page3, contentW, contentH);
 
             // ── 하단 버튼 바 ─────────────────────────────────
             var btnBar = new Panel
@@ -143,6 +155,7 @@ namespace ImeOverlay
             Controls.Add(sidebar);
             Controls.Add(_page1);
             Controls.Add(_page2);
+            Controls.Add(_page3);
             Controls.Add(btnBar);
 
             AcceptButton = btnOk;
@@ -153,8 +166,10 @@ namespace ImeOverlay
         {
             _page1.Visible = (n == 1);
             _page2.Visible = (n == 2);
+            _page3.Visible = (n == 3);
             _btnPage1.SetActive(n == 1);
             _btnPage2.SetActive(n == 2);
+            _btnPage3.SetActive(n == 3);
         }
 
         // ── 1페이지 ───────────────────────────────────────────
@@ -304,6 +319,98 @@ namespace ImeOverlay
             _previewPanel.Paint += OnPreviewPaint;
             previewCard.Controls.Add(_previewPanel);
             page.Controls.Add(previewCard);
+        }
+
+        // ── 3페이지: 제품 정보 ─────────────────────────────────
+        private void BuildPage3Content(Panel page, int w, int h)
+        {
+            int lx = 28, ly = 28, cardW = w - 56;
+
+            PageTitle(page, "제품 정보", lx, ly); ly += 50;
+
+            // 앱 소개 카드
+            var cInfo = DarkCard(lx, ly, cardW, 124); ly += 140;
+
+            var lblAppName = new Label
+            {
+                Text = "ImeOverlay", Location = new Point(16, 14), Size = new Size(300, 30),
+                ForeColor = C_TEXT, Font = new Font("맑은 고딕", 14f, FontStyle.Bold)
+            };
+            var lblVerInfo = new Label
+            {
+                Text = $"v{Updater.CurrentVersion}", Location = new Point(16, 48), Size = new Size(200, 22),
+                ForeColor = C_SUBTEXT, Font = new Font("맑은 고딕", 9.5f)
+            };
+            var lblDesc = new Label
+            {
+                Text = "마우스 커서 옆에 한글/영문(IME) 상태를 표시해주는 Windows 트레이 유틸리티입니다.",
+                Location = new Point(16, 76), Size = new Size(cardW - 32, 40),
+                ForeColor = C_SUBTEXT, Font = new Font("맑은 고딕", 9.5f)
+            };
+            cInfo.Controls.AddRange(new Control[] { lblAppName, lblVerInfo, lblDesc });
+            page.Controls.Add(cInfo);
+
+            // 제작자 / 후원 카드
+            var cAuthor = DarkCard(lx, ly, cardW, 156); ly += 172;
+            CardLabel(cAuthor, "제작자", 16, 14);
+
+            var lblAuthor = new Label
+            {
+                Text = "제작자: Means8_dev", Location = new Point(16, 38), Size = new Size(cardW - 32, 24),
+                ForeColor = C_TEXT, Font = new Font("맑은 고딕", 9.5f)
+            };
+
+            var lblBlog = MakeLinkLabel("블로그 바로가기", 16, 64,
+                "https://blog.naver.com/kmeans8");
+
+            var lblDonateMsg = new Label
+            {
+                Text = "이 프로그램이 마음에 드셨다면, 소정의 후원도 큰 힘이 됩니다 :)",
+                Location = new Point(16, 94), Size = new Size(cardW - 32, 22),
+                ForeColor = C_SUBTEXT, Font = new Font("맑은 고딕", 9f)
+            };
+            var txtDonate = new DarkTextBox
+            {
+                Text = "카카오뱅크 3333-10-4213685 (예금주: 김민수)",
+                Location = new Point(16, 118), Size = new Size(cardW - 32, 28),
+                ReadOnly = true, TextAlign = HorizontalAlignment.Left
+            };
+
+            cAuthor.Controls.AddRange(new Control[] { lblAuthor, lblBlog, lblDonateMsg, txtDonate });
+            page.Controls.Add(cAuthor);
+
+            // 링크 카드 (GitHub / 이슈 제보)
+            var cLinks = DarkCard(lx, ly, cardW, 96);
+            CardLabel(cLinks, "문의 / 이슈 제보", 16, 14);
+
+            var lblRepo = MakeLinkLabel("GitHub 저장소 바로가기", 16, 40,
+                "https://github.com/MinSoo97/CorsorImeOverlay.exe");
+            var lblIssue = MakeLinkLabel("버그 / 기능 제안 (GitHub Issues)", 16, 66,
+                "https://github.com/MinSoo97/CorsorImeOverlay.exe/issues");
+
+            cLinks.Controls.Add(lblRepo);
+            cLinks.Controls.Add(lblIssue);
+            page.Controls.Add(cLinks);
+        }
+
+        private LinkLabel MakeLinkLabel(string text, int x, int y, string url)
+        {
+            var lnk = new LinkLabel
+            {
+                Text = text, Location = new Point(x, y), Size = new Size(360, 22),
+                LinkColor = C_ACCENT, ActiveLinkColor = Color.FromArgb(140, 128, 255),
+                VisitedLinkColor = C_ACCENT, BackColor = Color.Transparent,
+                Font = new Font("맑은 고딕", 9.5f)
+            };
+            lnk.LinkClicked += (s, e) =>
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+                }
+                catch { }
+            };
+            return lnk;
         }
 
         private void AddColorRow(Panel parent, string labelText, int x, int y,
@@ -493,7 +600,8 @@ namespace ImeOverlay
             ForeColor  = textColor;
             Font       = new Font("맑은 고딕", 10f);
             Cursor     = Cursors.Hand;
-            TextAlign  = ContentAlignment.MiddleCenter;
+            TextAlign  = ContentAlignment.MiddleLeft;
+            Padding    = new Padding(20, 0, 0, 0);
         }
 
         public void SetActive(bool active)

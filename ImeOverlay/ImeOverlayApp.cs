@@ -92,7 +92,7 @@ namespace ImeOverlay
             menu.Items.Add(itemSettings);
 
             var itemUpdate = new ToolStripMenuItem("업데이트 확인");
-            itemUpdate.Click += async (s, e) => await Updater.CheckAsync();
+            itemUpdate.Click += async (s, e) => await Updater.CheckAsync(silent: false);
             menu.Items.Add(itemUpdate);
 
             menu.Items.Add(new ToolStripSeparator());
